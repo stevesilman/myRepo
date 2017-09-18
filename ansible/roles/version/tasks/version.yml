@@ -1,38 +1,5 @@
 ---
 
-- name: Set Facts
-  set_fact:
-    confluence_root_page_id: "9551504"
-    confluence_page_title: "Software_Versions"
-    confluence_space: "TSSYSA"
-    confluence_userid: "ssilman"
-    confluence_password: "Elsa1234"
-
-- debug: msg="confluence_root_page_id  {{ confluence_root_page_id }}"
-  when: confluence_root_page_id is defined
-
-- name: Get child page ids
-  shell: 'curl --silent -u {{ confluence_userid }}:{{ confluence_password }} https://wiki.salmon.com/rest/api/content/{{ confluence_root_page_id }}/child/page | grep -Po ''/rest/api/content/\K.*?(?=")'' | grep -v "/"  '
-  register: confluence_child_page_id
-  delegate_to: localhost
-  ignore_errors: yes
-  when: confluence_root_page_id is defined
-
-- name: delete current child page by id
-  uri:
-   url: https://wiki.salmon.com/rest/api/content/{{ item }}
-   method: DELETE
-   user: "{{ confluence_userid }}"
-   password: "{{ confluence_password }}"
-   force_basic_auth: yes
-   HEADER_Content-Type: "application/json"
-   body_format: json
-   validate_certs: no
-   status_code: 204
-  delegate_to: localhost
-  ignore_errors: yes
-  with_items: "{{ confluence_child_page_id.stdout_lines }}"
-  when: confluence_root_page_id is defined 
 
 - name: Retrieve software versions  
   shell: "yum list installed  {{ item.sw_path }} | grep {{ item.sw_path }} | awk '{print $2}' | cut -d'.' -f1-3"
@@ -70,17 +37,4 @@
 
 - debug: msg="{{ confluence_body.stdout }}"
 
-- name: add to confluence
-  uri:
-    url: https://wiki.salmon.com/rest/api/content/
-    method: POST
-    user: "{{ confluence_userid }}"
-    password: "{{ confluence_password }}"
-    force_basic_auth: yes
-    HEADER_Content-Type: "application/json"
-    body: {'type':'page','ancestors': [{'id': "{{ confluence_root_page_id }}" }],'type':'page','title':'{{ confluence_page_title }} {{ inventory_hostname }}','space':{'key': '{{ confluence_space }}'},'body':{'storage': {'value': '{{ confluence_body.stdout }}','representation': 'storage'}}}
-    body_format: json
-    validate_certs: no
-    status_code: 200
-  delegate_to: localhost
-  when: confluence_root_page_id is defined
+
