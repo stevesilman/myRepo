@@ -6,12 +6,6 @@
   with_items:
         - { sw_path: 'httpd24u.x86_64' }
         - { sw_path: 'httpd24u-mod_ssl' }
-        - { sw_path: 'php56u' }
-        - { sw_path: 'php56u-pecl-memcached' }
-        - { sw_path: 'php56u-pecl-apcu' }
-        - { sw_path: 'php56u-pecl-redis' }
-        - { sw_path: 'php56u-pecl-memcache' }
-        - { sw_path: 'redis30u' }
         - { sw_path: 'redis32u' }
         - { sw_path: 'Percona-Server-server' }
   register: versions
