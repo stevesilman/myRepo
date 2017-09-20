@@ -1,34 +1,10 @@
 ---
 
 
-- name: Retrieve software versions  
-  shell: "yum list installed  {{ item.sw_path }} | grep {{ item.sw_path }} | awk '{print $2}' | cut -d'.' -f1-3"
-  with_items:
-        - { sw_path: 'httpd24u.x86_64' }
-        - { sw_path: 'httpd24u-mod_ssl' }
-        - { sw_path: 'redis32u' }
-        - { sw_path: 'Percona-Server-server' }
+- name: Retrieve software list  
+  shell: "sudo dpkg -l"
   register: versions
 
-- name: Clear local tmp file
-  shell: "> /tmp/{{ inventory_hostname }}.txt"
-  delegate_to: localhost
-
-- name: Write data out
-  shell: "echo versions_{{ item.item }}={{ item.stdout_lines }} >> /tmp/{{ inventory_hostname }}.txt"
-  with_items: "{{ versions.results }}"
-  when: versions.results is defined 
-  delegate_to: localhost
-
-- name: Process data
-  shell: "echo '<table><tbody><tr><th>Package</th><th>Version</th></tr>';while read l; do pkg=$(echo $l | cut -d ' ' -f2 | cut -d '}' -f1 | sed -e s/^u// );ver=$(echo $l | cut -d '[' -f2 | cut -d ']' -f1 | sed -e s/^u// );if [ -z $ver ]; then echo '<tr><td>'$pkg'</td><td>'Missing'</td></tr>'; else echo '<tr><td>'$pkg'</td><td>'$ver'</td></tr>';fi;done < /tmp/{{ inventory_hostname }}.txt; echo '</tbody></table>'"
-  delegate_to: localhost
-  register: confluence_body_out
-
-- name: pretty up confluence_body remove new lines
-  set_fact:
-    confluence_body: "{{ confluence_body_out | regex_replace('\\\\n','') }}"
-
-- debug: msg="{{ confluence_body.stdout }}"
+- debug: msg="{{ versions.stdout }}"
 
 
