@@ -1,0 +1,4 @@
+# that match this role in the supplied inventory file.
+- hosts: servers 
+  roles:
+    - dockerBuild
