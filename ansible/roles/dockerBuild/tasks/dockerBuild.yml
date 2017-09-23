@@ -1,8 +1,7 @@
 ---
 - name: configure the container with ansible
   apt: pkg=nginx state=installed
+  delegate_to: localhost
 
-- name: create the site directory
-  file: dest=/var/www/site state=directory recurse=yes
 
 
