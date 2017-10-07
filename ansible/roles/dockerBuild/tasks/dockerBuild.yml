@@ -1,7 +1,7 @@
 ---
 - name: configure the container with ansible
   apt: pkg=nginx state=installed
-  delegate_to: localhost
+#  delegate_to: localhost
 
 
 
